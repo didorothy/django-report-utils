@@ -1,4 +1,5 @@
-from six import BytesIO, text_type
+from six import BytesIO, text_type, string_types
+from functools import reduce
 
 from django.http import HttpResponse
 from django.contrib.contenttypes.models import ContentType
@@ -10,6 +11,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl.cell import get_column_letter
 import re
 from collections import namedtuple
+import datetime
 from decimal import Decimal
 from numbers import Number
 
@@ -358,7 +360,7 @@ class DataExportMixin(object):
                         increment_total(field, display_totals, row[i])
             row = list(row)
             for position, choice_list in choice_lists.items():
-                row[position-1] = unicode(choice_list[row[position-1]])
+                row[position-1] = text_type(choice_list[row[position-1]], 'UTF-8')
             for position, display_format in display_formats.items():
                 # convert value to be formatted into Decimal in order to apply
                 # numeric formats
@@ -417,7 +419,7 @@ class DataExportMixin(object):
             result = datetime.date(datetime.MINYEAR, 1, 1)
         else:
             result = x[sort_key]
-        return result.lower() if isinstance(result, basestring) else result
+        return result.lower() if isinstance(result, string_types) else result
 
 
 class GetFieldsMixin(object):
